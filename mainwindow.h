@@ -19,3 +19,11 @@ public:
 private:
     Ui::MainWindow *ui;
 };
+
+class GameDisplay : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit GameDisplay(QWidget *parent = nullptr);
+};
