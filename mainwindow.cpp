@@ -3,9 +3,36 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
+#include <iostream>
+#include <filesystem>
 
-GameDisplay::GameDisplay(QWidget *parent)
-    : QWidget(parent)
+Emulator::Emulator(string id, string ext, string gh_path) : id(id), ext(ext), gh_path(gh_path)
+{
+    this->path = "/home/evanfox/Emulators/emulators/" + id;
+    string icon_path = this->path + "/icon.png";
+    if (std::filesystem::exists(icon_path))
+    {
+        this->icon = &QPixmap(QString::fromStdString(icon_path));
+    } else {
+        this->icon = &QPixmap(40, 40);
+        this->icon->fill(Qt::white);
+    }
+}
+
+Game::Game(string name, Emulator *emulator) : name(name), emulator(*emulator)
+{
+    this->path = emulator->getPath() + "/" + name;
+    string icon_path = this->path + "/icon.png";
+    if (std::filesystem::exists(icon_path))
+    {
+        this->icon = &QPixmap(QString::fromStdString(icon_path));
+    } else {
+        this->icon = &QPixmap(40, 40);
+        this->icon->fill(Qt::white);
+    }
+}
+
+GameDisplay::GameDisplay(QWidget *parent) : QWidget(parent)
 {
     QPixmap image(150, 150);
     image.fill(Qt::white);
