@@ -8,27 +8,29 @@
 
 Emulator::Emulator(string id, string ext, string gh_path) : id(id), ext(ext), gh_path(gh_path)
 {
-    this->path = "/home/evanfox/Emulators/emulators/" + id;
-    string icon_path = this->path + "/icon.png";
+    path = "/home/evanfox/Emulators/emulators/" + id;
+    run_path = path + "/" + id;
+    string icon_path = path + "/icon.png";
     if (std::filesystem::exists(icon_path))
     {
-        this->icon = &QPixmap(QString::fromStdString(icon_path));
+        icon = new QPixmap(QString::fromStdString(icon_path));
     } else {
-        this->icon = &QPixmap(40, 40);
-        this->icon->fill(Qt::white);
+        icon = new QPixmap(40, 40);
+        icon->fill(Qt::white);
     }
 }
 
 Game::Game(string name, Emulator *emulator) : name(name), emulator(*emulator)
 {
-    this->path = emulator->getPath() + "/" + name;
-    string icon_path = this->path + "/icon.png";
+    path = emulator->getPath() + "/games/" + name;
+    run_path = path + "/game." + emulator->getExt();
+    string icon_path = path + "/icon.png";
     if (std::filesystem::exists(icon_path))
     {
-        this->icon = &QPixmap(QString::fromStdString(icon_path));
+        icon = new QPixmap(QString::fromStdString(icon_path));
     } else {
-        this->icon = &QPixmap(40, 40);
-        this->icon->fill(Qt::white);
+        icon = new QPixmap(40, 40);
+        icon->fill(Qt::white);
     }
 }
 

@@ -31,7 +31,9 @@ private:
     string ext;
     string gh_path;
     string path;
+    string run_path;
     QPixmap *icon;
+    friend class Emulators;
 
     explicit Emulator(string id, string ext, string gh_path);
 
@@ -40,12 +42,11 @@ public:
     string getExt() { return ext; }
     string getGhPath() { return gh_path; }
     string getPath() { return path; }
+    string getRunPath() { return run_path; }
     QPixmap *getIcon() { return icon; }
     string getRunCmd(string game) { return ""; }
     string installedVersion() { return ""; }
     // TODO function to check latest version
-private:
-    friend class Emulators;
 };
 
 
@@ -56,7 +57,7 @@ class Emulators
     {
     public:
         _MelonDS() : Emulator("melonds", "nds", "melonDS-emu/melonDS") {}
-        string getRunCmd(Game *game) { return this->path + "/melonds \"" + game->getPath() + "\""; }
+        string getRunCmd(Game *game) { return getRunPath() + " \"" + game->getPath() + "\""; }
     };
 
 public:
@@ -68,6 +69,7 @@ class Game
 {
     string name;
     string path;
+    string run_path;
     Emulator emulator;
     QPixmap *icon;
 
@@ -75,6 +77,7 @@ public:
     explicit Game(string name, Emulator *emulator);
     string getName() { return name; }
     string getPath() { return path; }
+    string getRunPath() { return run_path; }
     Emulator getEmulator() { return emulator; }
     QPixmap *getIcon() { return icon; }
 };
