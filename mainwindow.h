@@ -3,6 +3,8 @@
 #include "emulators.h"
 
 #include <QMainWindow>
+#include <QResizeEvent>
+#include <QGridLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,11 +25,16 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     vector<GameDisplay*> game_displays;
+    QWidget *games;
 
 public:
+    
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void rearrange();
+    void resizeEvent(QResizeEvent *event) override;
 private:
     Ui::MainWindow *ui;
 };

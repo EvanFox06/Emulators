@@ -43,20 +43,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     EMULATORS.fetchGames();
     EMULATORS.loadIcons();
-    QWidget *container = new QWidget(this);
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    games = new QWidget(this);
+    games->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    QHBoxLayout *layout = new QHBoxLayout();
+    auto *layout = new QGridLayout();
 
     for ( Game &game : *(EMULATORS.getGames()) )
     {
-        auto *gd = new GameDisplay(&game, this);
-        game_displays.push_back(gd);
-        layout->addWidget(gd);
+        game_displays.push_back(new GameDisplay(&game, this));
     }
 
-    container->setLayout(layout);
-    container->adjustSize();
+    games->setLayout(layout);
+    games->adjustSize();
 }
 
 MainWindow::~MainWindow()
@@ -66,4 +64,28 @@ MainWindow::~MainWindow()
     {
         delete gd;
     }
+}
+
+void MainWindow::rearrange()
+{
+    QGridLayout *games_layout = qobject_cast<QGridLayout*>(games->layout());
+    int game_w = game_displays[0]->sizeHint().width() + 6;
+    int per_row = floor(size().width() / game_w);
+    if (!per_row) { per_row = 1; }
+    for (GameDisplay *gd : game_displays)
+    {
+        games_layout->takeAt(games_layout->indexOf(gd));
+    }
+    for (int i = 0 ; i < game_displays.size() ; i++)
+    {
+        GameDisplay *gd = game_displays[i];
+        games_layout->addWidget(gd, floor(i / per_row), i % per_row);
+    }
+    games->adjustSize();
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    rearrange();
+    QMainWindow::resizeEvent(event);
 }

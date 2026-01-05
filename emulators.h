@@ -78,10 +78,27 @@ class Emulators
         string getRunCmd(string game) override { return getRunPath() + " \"" + game + "\""; }
     };
 
+    class _Dolphin : public Emulator
+    {
+    public:
+        _Dolphin() : Emulator("dolphin", "rvz", "") {}
+        string getRunCmd(string game) override { return getRunPath() + " \"" + game + "\""; }
+    };
+
+    class _Azahar : public Emulator
+    {
+    public:
+        _Azahar() : Emulator("azahar", "cci", "azahar-emu/azahar") {}
+        string getRunCmd(string game) override { return getRunPath() + " \"" + game + "\""; }
+    };
+
 public:
     _MelonDS MELONDS = _MelonDS();
     _Mgba MGBA = _Mgba();
-    array<Emulator*, 2> ALL = {&MELONDS, &MGBA};
+    _Dolphin DOLPHIN = _Dolphin();
+    _Azahar AZAHAR = _Azahar();
+    array<Emulator*, 4> ALL = {&MELONDS, &MGBA, &DOLPHIN, &AZAHAR};
+    
     void fetchGames();
     void loadIcons();
 
