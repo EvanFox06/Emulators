@@ -49,22 +49,6 @@ public:
     // TODO function to check latest version
 };
 
-
-class Emulators
-{
-    // TODO functions to check installed versions for all emulators
-    class _MelonDS : public Emulator
-    {
-    public:
-        _MelonDS() : Emulator("melonds", "nds", "melonDS-emu/melonDS") {}
-        string getRunCmd(Game *game) { return getRunPath() + " \"" + game->getPath() + "\""; }
-    };
-
-public:
-    Emulator *MELONDS = new _MelonDS();
-    const array<Emulator*, 1> ALL = {MELONDS};
-};
-
 class Game
 {
     string name;
@@ -80,6 +64,21 @@ public:
     string getRunPath() { return run_path; }
     Emulator getEmulator() { return emulator; }
     QPixmap *getIcon() { return icon; }
+};
+
+class Emulators
+{
+    // TODO functions to check installed versions for all emulators
+    class _MelonDS : public Emulator
+    {
+    public:
+        _MelonDS() : Emulator("melonds", "nds", "melonDS-emu/melonDS") {}
+        string getRunCmd(Game *game) { return getRunPath() + " \"" + game->getPath() + "\""; }
+    };
+
+public:
+    Emulator *MELONDS = new _MelonDS();
+    const array<Emulator*, 1> ALL = {MELONDS};
 };
 
 class GameDisplay : public QWidget
