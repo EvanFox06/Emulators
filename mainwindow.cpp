@@ -1,16 +1,12 @@
 #include "mainwindow.h"
-#include "emulators.h"
 #include "ui_mainwindow.h"
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
 #include <iostream>
 
-GameDisplay::GameDisplay(QWidget *parent) : QWidget(parent)
+GameDisplay::GameDisplay(Game *game, QWidget *parent) : QWidget(parent)
 {
-    QPixmap image(150, 150);
-    image.fill(Qt::white);
-
     QGridLayout *top_layout = new QGridLayout();
     QWidget *display = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout();
@@ -18,11 +14,11 @@ GameDisplay::GameDisplay(QWidget *parent) : QWidget(parent)
 
     QLabel *icon = new QLabel();
     icon->setFixedSize(150, 150);
-    icon->setPixmap(image);
+    icon->setPixmap(*(game->getIcon()));
     layout->addWidget(icon);
 
     QLabel *name_label = new QLabel();
-    name_label->setText("Game Name");
+    name_label->setText(game->getName().c_str());
     name_label->setAlignment(Qt::AlignHCenter);
     name_label->setStyleSheet("font: 20px;");
     name_label->setMaximumWidth(150);
@@ -45,10 +41,29 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    auto *button = new GameDisplay(this);
+    EMULATORS.fetchGames();
+    EMULATORS.loadIcons();
+    QWidget *container = new QWidget(this);
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    for ( Game &game : *(EMULATORS.getGames()) )
+    {
+        auto *gd = new GameDisplay(&game, this);
+        game_displays.push_back(gd);
+        layout->addWidget(gd);
+    }
+
+    container->setLayout(layout);
+    container->adjustSize();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    for (GameDisplay *gd : game_displays)
+    {
+        delete gd;
+    }
 }

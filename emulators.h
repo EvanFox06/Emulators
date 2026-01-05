@@ -17,25 +17,27 @@ private:
     string gh_path;
     string path;
     string run_path;
-    QPixmap icon;
+    QPixmap *icon;
     vector<string> game_ids;
     friend class Emulators;
 
     Emulator(string id, string ext, string gh_path);
 
 public:
+    ~Emulator();
     string getId() { return id; }
     string getExt() { return ext; }
     string getGhPath() { return gh_path; }
     string getPath() { return path; }
     string getRunPath() { return run_path; }
-    QPixmap *getIcon() { return &icon; }
+    QPixmap *getIcon() { return icon; }
     vector<string> *getGames() { return &game_ids; }
 
-    string getRunCmd(string game) { return ""; }
-    string installedVersion() { return ""; }
+    virtual string getRunCmd(string game) { return ""; }
+    virtual string installedVersion() { return ""; }
 
     void fetchGameIDs();
+    void loadIcon();
     // TODO function to check latest version
 };
 
@@ -52,8 +54,10 @@ public:
     string getName() { return name; }
     string getPath() { return path; }
     string getRunPath() { return run_path; }
-    Emulator getEmulator() { return emulator; }
+    Emulator *getEmulator() { return &emulator; }
     QPixmap *getIcon() { return &icon; }
+
+    bool operator < (const Game &game) const { return (this->name < game.name); }
 };
 
 class Emulators
@@ -64,12 +68,25 @@ class Emulators
     {
     public:
         _MelonDS() : Emulator("melonds", "nds", "melonDS-emu/melonDS") {}
-        string getRunCmd(Game *game) { return getRunPath() + " \"" + game->getPath() + "\""; }
+        string getRunCmd(string game) override { return getRunPath() + " \"" + game + "\""; }
+    };
+
+    class _Mgba : public Emulator
+    {
+    public:
+        _Mgba() : Emulator("mgba", "gba", "mgba-emu/mgba") {}
+        string getRunCmd(string game) override { return getRunPath() + " \"" + game + "\""; }
     };
 
 public:
     _MelonDS MELONDS = _MelonDS();
-    array<Emulator*, 1> ALL() { return {&MELONDS}; }
+    _Mgba MGBA = _Mgba();
+    array<Emulator*, 2> ALL = {&MELONDS, &MGBA};
     void fetchGames();
+    void loadIcons();
+
+    vector<Game> *getGames() { return &games; }
 
 };
+
+extern Emulators EMULATORS;
