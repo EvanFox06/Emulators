@@ -1,38 +1,10 @@
 #include "mainwindow.h"
+#include "emulators.h"
 #include "ui_mainwindow.h"
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
 #include <iostream>
-#include <filesystem>
-
-Emulator::Emulator(string id, string ext, string gh_path) : id(id), ext(ext), gh_path(gh_path)
-{
-    path = "/home/evanfox/Emulators/emulators/" + id;
-    run_path = path + "/" + id;
-    string icon_path = path + "/icon.png";
-    if (std::filesystem::exists(icon_path))
-    {
-        icon = new QPixmap(QString::fromStdString(icon_path));
-    } else {
-        icon = new QPixmap(40, 40);
-        icon->fill(Qt::white);
-    }
-}
-
-Game::Game(string name, Emulator *emulator) : name(name), emulator(*emulator)
-{
-    path = emulator->getPath() + "/games/" + name;
-    run_path = path + "/game." + emulator->getExt();
-    string icon_path = path + "/icon.png";
-    if (std::filesystem::exists(icon_path))
-    {
-        icon = new QPixmap(QString::fromStdString(icon_path));
-    } else {
-        icon = new QPixmap(40, 40);
-        icon->fill(Qt::white);
-    }
-}
 
 GameDisplay::GameDisplay(QWidget *parent) : QWidget(parent)
 {
