@@ -19,10 +19,13 @@ void Emulator::runGame(string game, QProcess *process)
 
 void Emulator::loadIcon()
 {
-    string icon_path = path + "/icon.png";
+    string icon_path = path + "/" + id + ".png";
     if (std::filesystem::exists(icon_path))
     {
-        icon = new QPixmap(QString::fromStdString(icon_path));
+        QPixmap *temp_icon = new QPixmap(QString::fromStdString(icon_path));
+        QPixmap icon_obj = temp_icon->scaled(40, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        icon = new QPixmap(icon_obj);
+        delete temp_icon;
     } else {
         icon = new QPixmap(40, 40);
         icon->fill(Qt::white);

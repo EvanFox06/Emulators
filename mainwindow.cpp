@@ -3,19 +3,27 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QScrollArea>
+
 #include <iostream>
 
 GameDisplay::GameDisplay(Game *game, QWidget *parent) : QWidget(parent), game(game)
 {
     QGridLayout *top_layout = new QGridLayout();
     QWidget *display = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout();
+    QGridLayout *layout = new QGridLayout();
     top_layout->addWidget(display, 0, 0);
 
     QLabel *icon = new QLabel();
     icon->setFixedSize(150, 150);
     icon->setPixmap(*(game->getIcon()));
-    layout->addWidget(icon);
+    layout->addWidget(icon, 0, 0);
+
+    QLabel *emu_icon = new QLabel();
+    emu_icon->setFixedSize(40, 40);
+    emu_icon->setPixmap(*(game->getEmulator()->getIcon()));
+    layout->addWidget(emu_icon, 0, 0);
+    layout->setAlignment(emu_icon, Qt::AlignBottom | Qt::AlignRight);
 
     QLabel *name_label = new QLabel();
     name_label->setText(game->getName().c_str());
@@ -23,7 +31,7 @@ GameDisplay::GameDisplay(Game *game, QWidget *parent) : QWidget(parent), game(ga
     name_label->setStyleSheet("font: 20px;");
     name_label->setMaximumWidth(150);
     name_label->setWordWrap(true);
-    layout->addWidget(name_label);
+    layout->addWidget(name_label, 1, 0);
 
     QPushButton *button = new QPushButton();
     button->setStyleSheet("background-color: rgba(0, 0, 0, 0)");
@@ -55,18 +63,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     menuBar()->addAction(dolphinAction);
 
-    games = new QWidget(centralWidget());
-    games->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    auto *scroll = new QScrollArea();
+    games = new QWidget();
 
     auto *layout = new QGridLayout();
 
     for ( Game *game : *(EMULATORS.getGames()) )
     {
-        game_displays.push_back(new GameDisplay(game, this));
+        game_displays.push_back(new GameDisplay(game, games));
     }
 
     games->setLayout(layout);
     games->adjustSize();
+    scroll->setWidget(games);
+    auto *centralLayout = new QVBoxLayout();
+    centralLayout->addWidget(scroll);
+    centralWidget()->setLayout(centralLayout);
 }
 
 MainWindow::~MainWindow()
@@ -83,7 +95,7 @@ void MainWindow::rearrange()
 {
     QGridLayout *games_layout = qobject_cast<QGridLayout*>(games->layout());
     int game_w = game_displays[0]->sizeHint().width() + 6;
-    int per_row = floor(size().width() / game_w);
+    int per_row = floor((size().width() - 40) / game_w);
     if (!per_row) { per_row = 1; }
     for (GameDisplay *gd : game_displays)
     {
