@@ -12,6 +12,11 @@ Emulator::~Emulator()
     delete icon;
 }
 
+void Emulator::runGame(string game, QProcess *process)
+{
+    process->start(getRunPath().c_str(), QStringList() << game.c_str());
+}
+
 void Emulator::loadIcon()
 {
     string icon_path = path + "/icon.png";
@@ -37,8 +42,9 @@ void Emulator::fetchGameIDs()
     }
 }
 
-Game::Game(string name, Emulator *emulator) : name(name), emulator(*emulator)
+Game::Game(string name, Emulator *emulator) : name(name), emulator(emulator)
 {
+    process = new QProcess();
     path = emulator->getPath() + "/games/" + name;
     run_path = path + "/game." + emulator->getExt();
     string icon_path = path + "/icon.png";
@@ -51,6 +57,16 @@ Game::Game(string name, Emulator *emulator) : name(name), emulator(*emulator)
     }
 }
 
+Game::~Game()
+{
+    delete process;
+}
+
+void Game::run()
+{
+    getEmulator()->runGame(getRunPath(), process);
+}
+
 void Emulators::fetchGames()
 {
     games.clear();
@@ -59,10 +75,10 @@ void Emulators::fetchGames()
         emulator->fetchGameIDs();
         for (string id : *(emulator->getGames()))
         {
-            games.push_back(Game(id, emulator));
+            games.push_back(new Game(id, emulator));
         }
     }
-    sort(games.begin(), games.end());
+    sort(games.begin(), games.end(), Game::comparePtr);
 }
 
 void Emulators::loadIcons()
@@ -70,6 +86,14 @@ void Emulators::loadIcons()
     for (Emulator *emulator : ALL)
     {
         emulator->loadIcon();
+    }
+}
+
+Emulators::~Emulators()
+{
+    for (Game *game : games)
+    {
+        delete game;
     }
 }
 

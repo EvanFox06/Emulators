@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <iostream>
 
-GameDisplay::GameDisplay(Game *game, QWidget *parent) : QWidget(parent)
+GameDisplay::GameDisplay(Game *game, QWidget *parent) : QWidget(parent), game(game)
 {
     QGridLayout *top_layout = new QGridLayout();
     QWidget *display = new QWidget();
@@ -29,11 +29,17 @@ GameDisplay::GameDisplay(Game *game, QWidget *parent) : QWidget(parent)
     button->setStyleSheet("background-color: rgba(0, 0, 0, 0)");
     top_layout->addWidget(button, 0, 0);
     button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(button, &QPushButton::clicked, this, &GameDisplay::run);
 
     display->setLayout(layout);
     display->adjustSize();
     this->setLayout(top_layout);
     this->adjustSize();
+}
+
+void GameDisplay::run()
+{
+    game->run();
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -48,9 +54,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto *layout = new QGridLayout();
 
-    for ( Game &game : *(EMULATORS.getGames()) )
+    for ( Game *game : *(EMULATORS.getGames()) )
     {
-        game_displays.push_back(new GameDisplay(&game, this));
+        game_displays.push_back(new GameDisplay(game, this));
     }
 
     games->setLayout(layout);

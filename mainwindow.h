@@ -16,8 +16,12 @@ class GameDisplay : public QWidget
 {
     Q_OBJECT
 
+
 public:
+    Game *game;
     GameDisplay(Game *game, QWidget *parent = nullptr);
+public slots:
+    void run();
 };
 
 class MainWindow : public QMainWindow
