@@ -89,12 +89,18 @@ void Emulators::loadIcons()
     }
 }
 
+void Emulators::startDolphin()
+{
+    dolphinProcess->start(DOLPHIN.getRunPath().c_str());
+}
+
 Emulators::~Emulators()
 {
     for (Game *game : games)
     {
         delete game;
     }
+    delete dolphinProcess;
 }
 
 Emulators EMULATORS = Emulators();

@@ -28,8 +28,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    Ui::MainWindow *ui;
     vector<GameDisplay*> game_displays;
     QWidget *games;
+    QAction *dolphinAction;
 
 public:
     
@@ -39,6 +41,7 @@ public:
 protected:
     void rearrange();
     void resizeEvent(QResizeEvent *event) override;
-private:
-    Ui::MainWindow *ui;
+
+private slots:
+    void openDolphin() { EMULATORS.startDolphin(); };
 };

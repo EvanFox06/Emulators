@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QStringList>
+#include <QAction>
 
 using namespace std;
 
@@ -103,6 +104,9 @@ public:
     _Dolphin DOLPHIN = _Dolphin();
     _Azahar AZAHAR = _Azahar();
     array<Emulator*, 4> ALL = {&MELONDS, &MGBA, &DOLPHIN, &AZAHAR};
+
+    QProcess *dolphinProcess = new QProcess();
+    void startDolphin();
 
     void fetchGames();
     void loadIcons();

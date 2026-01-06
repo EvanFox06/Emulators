@@ -49,7 +49,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     EMULATORS.fetchGames();
     EMULATORS.loadIcons();
-    games = new QWidget(this);
+
+    dolphinAction = new QAction("Open Dolphin");
+    connect(dolphinAction, &QAction::triggered, this, &MainWindow::openDolphin);
+
+    menuBar()->addAction(dolphinAction);
+
+    games = new QWidget(centralWidget());
     games->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     auto *layout = new QGridLayout();
@@ -66,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete dolphinAction;
     for (GameDisplay *gd : game_displays)
     {
         delete gd;
