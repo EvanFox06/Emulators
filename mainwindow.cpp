@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
-#include <QScrollArea>
 
 #include <iostream>
 
@@ -63,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     menuBar()->addAction(dolphinAction);
 
-    auto *scroll = new QScrollArea();
+    scroll = new QScrollArea();
     games = new QWidget();
 
     auto *layout = new QGridLayout();
@@ -95,7 +94,7 @@ void MainWindow::rearrange()
 {
     QGridLayout *games_layout = qobject_cast<QGridLayout*>(games->layout());
     int game_w = game_displays[0]->sizeHint().width() + 6;
-    int per_row = floor((size().width() - 40) / game_w);
+    int per_row = floor((scroll->viewport()->width() - 5) / game_w);
     if (!per_row) { per_row = 1; }
     for (GameDisplay *gd : game_displays)
     {

@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QResizeEvent>
 #include <QGridLayout>
+#include <QScrollArea>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,6 +32,7 @@ class MainWindow : public QMainWindow
     Ui::MainWindow *ui;
     vector<GameDisplay*> game_displays;
     QWidget *games;
+    QScrollArea *scroll;
     QAction *dolphinAction;
 
 public:
