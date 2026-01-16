@@ -7,8 +7,11 @@
 
 #include <QPixmap>
 #include <QProcess>
+#include <QNetworkAccessManager>
 
 using namespace std;
+
+class EmulatorVersionReply;
 
 class Emulator
 {
@@ -35,9 +38,23 @@ public:
     vector<string> *getGames() { return &game_ids; }
 
     void runGame(string game, QProcess *process);
-    virtual string installedVersion() { return ""; }
+    virtual string currentVersion() { return ""; }
+    virtual EmulatorVersionReply *fetchLatestVersion(QNetworkAccessManager *manager);
 
     void fetchGameIDs();
     void loadIcon();
-    // TODO function to check latest version
+};
+
+class EmulatorVersionReply
+{
+    QNetworkReply *reply;
+    Emulator *emulator;
+    bool check;
+
+public:
+    EmulatorVersionReply(Emulator *emulator): emulator(emulator), check(false) {};
+    EmulatorVersionReply(Emulator *emulator, QNetworkReply *reply): emulator(emulator), reply(reply), check(true) {};
+    QNetworkReply *getReply() { return reply; }
+    Emulator *getEmulator() { return emulator; }
+    bool shouldCheck() { return check; }
 };

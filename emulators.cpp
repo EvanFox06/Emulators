@@ -52,6 +52,46 @@ void Emulators::startDolphin()
     dolphinProcess->start(DOLPHIN.getRunPath().c_str());
 }
 
+string Emulators::_MelonDS::currentVersion()
+{
+    QProcess getVersion;
+    getVersion.start(getRunPath().c_str(), QStringList() << "--help");
+    getVersion.waitForFinished();
+    auto out = string(getVersion.readAllStandardOutput());
+    int start = out.find(' ') + 1;
+    return out.substr(start, out.find('\n') - start);
+}
+
+string Emulators::_Mgba::currentVersion()
+{
+    QProcess getVersion;
+    getVersion.start(getRunPath().c_str(), QStringList() << "--version");
+    getVersion.waitForFinished();
+    auto out = string(getVersion.readAllStandardOutput());
+    int start = out.find(' ') + 1;
+    return out.substr(start, out.find(' ', start) - start);
+}
+
+string Emulators::_Azahar::currentVersion()
+{
+    QProcess getVersion;
+    getVersion.start(getRunPath().c_str(), QStringList() << "-v");
+    getVersion.waitForFinished();
+    auto out = string(getVersion.readAllStandardOutput());
+    int start = out.find(' ') + 1;
+    return out.substr(start, out.length() - start - 1);
+}
+
+vector<EmulatorVersionReply*> Emulators::fetchLatestVersions(QNetworkAccessManager *manager)
+{
+    vector<EmulatorVersionReply*> replies;
+    for (Emulator *emulator : ALL)
+    {
+        replies.push_back(emulator->fetchLatestVersion(manager));
+    }
+    return replies;
+}
+
 Emulators::~Emulators()
 {
     for (Game *game : games)

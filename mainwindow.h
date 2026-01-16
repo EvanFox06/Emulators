@@ -6,6 +6,7 @@
 #include <QResizeEvent>
 #include <QGridLayout>
 #include <QScrollArea>
+#include <QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,6 +35,12 @@ class MainWindow : public QMainWindow
     QWidget *games;
     QScrollArea *scroll;
     QAction *dolphinAction;
+    QNetworkAccessManager *networkManager;
+    vector<EmulatorVersionReply*> emuVerReplies;
+    vector<array<string, 3>> emulatorVers;
+
+    void onFetchEmuVer(EmulatorVersionReply *reply);
+    void doneFetchingVers();
 
 public:
     

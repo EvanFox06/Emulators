@@ -43,3 +43,15 @@ void Emulator::fetchGameIDs()
         }
     }
 }
+
+EmulatorVersionReply *Emulator::fetchLatestVersion(QNetworkAccessManager *manager)
+{
+    QUrl url((string("https://api.github.com/repos/") + getGhPath() + string("/releases/latest")).c_str());
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, "EvanFox06");
+    request.setRawHeader("Accept", "application/vnd.github+json");
+    request.setRawHeader("X-GitHub-Api-Version", "2022-11-28");
+
+    QNetworkReply *reply = manager->get(request);
+    return new EmulatorVersionReply(this, reply);
+}

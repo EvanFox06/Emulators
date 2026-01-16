@@ -3,6 +3,9 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMessageBox>
 
 #include <iostream>
 
@@ -78,15 +81,76 @@ MainWindow::MainWindow(QWidget *parent)
     auto *centralLayout = new QVBoxLayout();
     centralLayout->addWidget(scroll);
     centralWidget()->setLayout(centralLayout);
+
+    networkManager = new QNetworkAccessManager(this);
+    emuVerReplies = EMULATORS.fetchLatestVersions(networkManager);
+    for (EmulatorVersionReply *reply : emuVerReplies)
+    {
+        if (!(reply->shouldCheck()))
+        {
+            emulatorVers.push_back({reply->getEmulator()->getId(), "auto", "auto"});
+            continue;
+        }
+        connect(reply->getReply(), &QNetworkReply::finished, this, [=]() { onFetchEmuVer(reply); });
+    }
+}
+
+void MainWindow::onFetchEmuVer(EmulatorVersionReply *reply)
+{
+    QNetworkReply *qReply = reply->getReply();
+    if (qReply->error() == QNetworkReply::NoError)
+    {
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(qReply->readAll());
+        emulatorVers.push_back({
+            reply->getEmulator()->getId(),
+            reply->getEmulator()->currentVersion(),
+            jsonResponse.object()["tag_name"].toString().toStdString()
+        });
+    } else {
+        qDebug() << "Network error: " << qReply->errorString();
+    }
+    qReply->deleteLater();
+    if (emulatorVers.size() == emuVerReplies.size())
+    {
+        doneFetchingVers();
+    }
+}
+
+void MainWindow::doneFetchingVers()
+{
+    vector<array<string, 3>> outdated;
+    for (array<string, 3> vers : emulatorVers) { if (vers[1] != vers[2]) { outdated.push_back(vers); } }
+
+    string msg = "";
+    for (int i = 0 ; i < outdated.size() ; i++)
+    {
+        array<string, 3> vers = outdated[i];
+        msg += vers[0] + " is outdated!\ninstalled: " + vers[1] + "\nlatest: " + vers[2];
+        if (i != (outdated.size() - 1)) { msg += "\n\n"; }
+    }
+    if (msg != "")
+    {
+        QMessageBox::warning
+        ( 
+            this, 
+            tr("Emulator outdated!"), 
+            tr(msg.c_str())
+        );
+    }
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete dolphinAction;
+    delete networkManager;
     for (GameDisplay *gd : game_displays)
     {
         delete gd;
+    }
+    for (EmulatorVersionReply *reply : emuVerReplies)
+    {
+        delete reply;
     }
 }
 

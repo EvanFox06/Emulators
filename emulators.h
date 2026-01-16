@@ -33,29 +33,34 @@ public:
 class Emulators
 {
     vector<Game*> games;
-    // TODO functions to check installed versions for all emulators
+
     class _MelonDS : public Emulator
     {
     public:
         _MelonDS() : Emulator("melonds", "nds", "melonDS-emu/melonDS") {}
+        string currentVersion();
     };
 
     class _Mgba : public Emulator
     {
     public:
         _Mgba() : Emulator("mgba", "gba", "mgba-emu/mgba") {}
+        string currentVersion();
     };
 
     class _Dolphin : public Emulator
     {
     public:
-        _Dolphin() : Emulator("dolphin", "rvz", "") {}
+        _Dolphin() : Emulator("dolphin", "rvz", "dolphin-emu/dolphin") {}
+        string currentVersion() {return "auto";}
+        EmulatorVersionReply *fetchLatestVersion(QNetworkAccessManager *manager) { return new EmulatorVersionReply(this); }
     };
 
     class _Azahar : public Emulator
     {
     public:
         _Azahar() : Emulator("azahar", "cci", "azahar-emu/azahar") {}
+        string currentVersion();
     };
 
 public:
@@ -71,6 +76,7 @@ public:
 
     void fetchGames();
     void loadIcons();
+    vector<EmulatorVersionReply*> fetchLatestVersions(QNetworkAccessManager *manager);
 
     vector<Game*> *getGames() { return &games; }
 
