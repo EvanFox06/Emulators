@@ -19,6 +19,8 @@ qt_add_executable(Emulators
     emulators.h
     emulator.cpp
     emulator.h
+    emulatorsdialog.cpp
+    emulatorsdialog.h
 )
 
 target_link_libraries(Emulators PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

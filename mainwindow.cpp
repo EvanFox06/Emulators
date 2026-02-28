@@ -5,7 +5,6 @@
 #include <QPushButton>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMessageBox>
 
 #include <iostream>
 
@@ -62,8 +61,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     dolphinAction = new QAction("Open Dolphin");
     connect(dolphinAction, &QAction::triggered, this, &MainWindow::openDolphin);
-
     menuBar()->addAction(dolphinAction);
+
+    emulatorsAction = new QAction("Emulators");
+    connect(emulatorsAction, &QAction::triggered, this, &MainWindow::openEmulatorsWindow);
+    menuBar()->addAction(emulatorsAction);
 
     scroll = new QScrollArea();
     games = new QWidget();
@@ -118,6 +120,8 @@ void MainWindow::onFetchEmuVer(EmulatorVersionReply *reply)
 
 void MainWindow::doneFetchingVers()
 {
+    emulatorsDialog = new EmulatorsDialog(&emulatorVers, networkManager, this);
+
     vector<array<string, 3>> outdated;
     for (array<string, 3> vers : emulatorVers) { if (vers[1] != vers[2]) { outdated.push_back(vers); } }
 
@@ -143,6 +147,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete dolphinAction;
+    delete emulatorsAction;
+    if (emulatorsDialog) {delete emulatorsDialog;}
     delete networkManager;
     for (GameDisplay *gd : game_displays)
     {

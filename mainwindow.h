@@ -1,6 +1,6 @@
 #pragma once
 
-#include "emulators.h"
+#include "emulatorsdialog.h"
 
 #include <QMainWindow>
 #include <QResizeEvent>
@@ -35,6 +35,8 @@ class MainWindow : public QMainWindow
     QWidget *games;
     QScrollArea *scroll;
     QAction *dolphinAction;
+    QAction *emulatorsAction;
+    EmulatorsDialog *emulatorsDialog = nullptr;
     QNetworkAccessManager *networkManager;
     vector<EmulatorVersionReply*> emuVerReplies;
     vector<array<string, 3>> emulatorVers;
@@ -53,4 +55,5 @@ protected:
 
 private slots:
     void openDolphin() { EMULATORS.startDolphin(); };
+    void openEmulatorsWindow() { if (emulatorsDialog) {emulatorsDialog->show();} };
 };

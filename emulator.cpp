@@ -9,11 +9,79 @@ Emulator::Emulator(string id, string ext, string gh_path) : id(id), ext(ext), gh
 Emulator::~Emulator()
 {
     delete icon;
+    delete update_reply;
 }
 
 void Emulator::runGame(string game, QProcess *process)
 {
     process->start(getRunPath().c_str(), QStringList() << game.c_str());
+}
+
+void Emulator::backup(QProcess *process)
+{
+    process->setWorkingDirectory(getPath().c_str());
+    process->start("zip", QStringList() << "-r" << ("../../backups/" + getId() + ".zip").c_str() << "games" << (getId() + ".config").c_str() << (getId() + ".home").c_str());
+}
+
+void Emulator::backup(QProcess *process, const QObject *receiver, const QMetaMethod &method)
+{
+    process->setWorkingDirectory(getPath().c_str());
+    process->start("zip", QStringList() << "-r" << ("../../backups/" + getId() + ".zip").c_str() << "games" << (getId() + ".config").c_str() << (getId() + ".home").c_str());
+    // connect(process, &QProcess::finished, receiver, method, Qt::SingleShotConnection);
+}
+
+void Emulator::backup_update(QProcess *process, QNetworkAccessManager *manager, function<void()> when_done)
+{
+    process->setWorkingDirectory(getPath().c_str());
+    process->start("zip", QStringList() << "-r" << ("../../backups/" + getId() + ".zip").c_str() << "games" << (getId() + ".config").c_str() << (getId() + ".home").c_str());
+    connect(process, &QProcess::finished, this, [=]() {this->update(manager, when_done);}, Qt::SingleShotConnection);
+}
+
+void Emulator::update(QNetworkAccessManager *manager, function<void()> when_done)
+{
+    if (update_reply) {delete update_reply;}
+    update_reply = this->fetchLatestVersion(manager);
+    connect(update_reply->getReply(), &QNetworkReply::finished, this, [=]() {this->update2(manager, when_done);});
+}
+
+void Emulator::update2(QNetworkAccessManager *manager, function<void()> when_done)
+{
+    QNetworkReply *qReply = update_reply->getReply();
+    if (qReply->error() == QNetworkReply::NoError)
+    {
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(qReply->readAll());
+        QString dl_link;
+        for (QJsonValue object : jsonResponse.object()["assets"].toArray())
+        {
+            QString name = object["name"].toString();
+            if (name.toLower().endsWith(".appimage") && !name.toLower().contains("wayland")) {
+                dl_link = object["browser_download_url"].toString();
+                break;
+            }
+        }
+        QFile *file = new QFile(getRunPath().c_str());
+        qDebug() << "Deleting file: " << getRunPath();
+        file->remove();
+        qDebug() << "Downloading: " << dl_link;
+        file->open(QIODevice::WriteOnly);
+        QNetworkReply *reply = manager->get(QNetworkRequest(QUrl(dl_link)));
+        connect(reply, &QNetworkReply::readyRead, this, [=]() {file->write(reply->readAll());});
+        connect(reply, &QNetworkReply::downloadProgress, this, [=](qint64 bytesReceived, qint64 bytesTotal) {
+            qDebug() << bytesReceived << " / " << bytesTotal;
+        });
+        connect(reply, &QNetworkReply::finished, this, [=]() {
+            file->flush();
+            file->close();
+            file->setPermissions(file->permissions() | QFileDevice::ExeOwner | QFileDevice::ExeGroup | QFileDevice::ExeOther);
+            delete file;
+            when_done();
+            reply->deleteLater();
+            qDebug() << "Done";
+        });
+    } else {
+        qDebug() << "Network error: " << qReply->errorString();
+    }
+    qReply->deleteLater();
 }
 
 void Emulator::loadIcon()

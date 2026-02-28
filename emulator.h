@@ -8,13 +8,21 @@
 #include <QPixmap>
 #include <QProcess>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QMetaMethod>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
 
 using namespace std;
 
 class EmulatorVersionReply;
 
-class Emulator
+class Emulator : QObject
 {
+    Q_OBJECT
+
 private:
     string id;
     string ext;
@@ -23,9 +31,12 @@ private:
     string run_path;
     QPixmap *icon;
     vector<string> game_ids;
+    EmulatorVersionReply *update_reply;
     friend class Emulators;
 
     Emulator(string id, string ext, string gh_path);
+    void update2(QNetworkAccessManager *manager, function<void()> when_done);
+    void update2(QNetworkAccessManager *manager, const QObject *receiver, const QMetaMethod &method);
 
 public:
     ~Emulator();
@@ -43,6 +54,12 @@ public:
 
     void fetchGameIDs();
     void loadIcon();
+
+    void backup(QProcess *process);
+    void backup(QProcess *process, const QObject *receiver, const QMetaMethod &method);
+    void backup_update(QProcess *process, QNetworkAccessManager *manager, function<void()> when_done);
+    void update(QNetworkAccessManager *manager, function<void()> when_done);
+    void update(QNetworkAccessManager *manager, const QObject *receiver, const QMetaMethod &method);
 };
 
 class EmulatorVersionReply
