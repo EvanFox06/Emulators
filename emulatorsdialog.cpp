@@ -33,7 +33,7 @@ EmuOptions::EmuOptions(Emulator *emulator, array<string, 3> ver, QProcess *proce
     updateButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(updateButton, &QPushButton::clicked, [=]() {
         updateButton->setDisabled(true);
-        emulator->backup_update(process, manager, [=]() {QMessageBox::information(parent, tr("Info"), tr("Update Done"));});
+        emulator->backup_update(parent, process, manager, [=]() {QMessageBox::information(parent, tr("Info"), tr("Update Done"));});
     });
     layout->addWidget(nameLabel, 0, 0);
     layout->addWidget(verLabel, 1, 0);
