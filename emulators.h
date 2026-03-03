@@ -70,6 +70,7 @@ public:
     _Dolphin DOLPHIN = _Dolphin();
     _Azahar AZAHAR = _Azahar();
     array<Emulator*, 4> ALL = {&MELONDS, &MGBA, &DOLPHIN, &AZAHAR};
+    Emulator *fromExt(QString ext);
 
     QProcess *dolphinProcess = new QProcess();
     void startDolphin();

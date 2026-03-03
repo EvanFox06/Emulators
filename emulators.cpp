@@ -47,6 +47,15 @@ void Emulators::loadIcons()
     }
 }
 
+Emulator *Emulators::fromExt(QString ext)
+{
+    for (Emulator *emu : ALL)
+    {
+        if (ext == QString::fromStdString(emu->getExt())) { return emu; }
+    }
+    return nullptr;
+}
+
 void Emulators::startDolphin()
 {
     dolphinProcess->start(DOLPHIN.getRunPath().c_str());

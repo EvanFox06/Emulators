@@ -23,6 +23,8 @@ qt_add_executable(Emulators
     emulatorsdialog.h
     updatethread.h
     updatethread.cpp
+    addgamedialog.h
+    addgamedialog.cpp
 )
 
 target_link_libraries(Emulators PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

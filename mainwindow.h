@@ -1,6 +1,7 @@
 #pragma once
 
 #include "emulatorsdialog.h"
+#include "addgamedialog.h"
 
 #include <QMainWindow>
 #include <QResizeEvent>
@@ -34,9 +35,11 @@ class MainWindow : public QMainWindow
     vector<GameDisplay*> game_displays;
     QWidget *games;
     QScrollArea *scroll;
-    QAction *dolphinAction;
     QAction *emulatorsAction;
+    QAction *addGameAction;
+    QAction *dolphinAction;
     EmulatorsDialog *emulatorsDialog = nullptr;
+    AddGameDialog *addGameDialog = nullptr;
     QNetworkAccessManager *networkManager;
     vector<EmulatorVersionReply*> emuVerReplies;
     vector<array<string, 3>> emulatorVers;
@@ -54,6 +57,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void openDolphin() { EMULATORS.startDolphin(); };
-    void openEmulatorsWindow() { if (emulatorsDialog) {emulatorsDialog->show();} };
+    void openDolphin() { EMULATORS.startDolphin(); }
+    void openEmulatorsWindow() { if (emulatorsDialog) {emulatorsDialog->show();} }
+    void openAddGameDialog() { if (addGameDialog) {addGameDialog->show();} }
 };

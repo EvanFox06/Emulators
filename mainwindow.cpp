@@ -59,13 +59,18 @@ MainWindow::MainWindow(QWidget *parent)
     EMULATORS.fetchGames();
     EMULATORS.loadIcons();
 
-    dolphinAction = new QAction("Open Dolphin");
-    connect(dolphinAction, &QAction::triggered, this, &MainWindow::openDolphin);
-    menuBar()->addAction(dolphinAction);
-
     emulatorsAction = new QAction("Emulators");
     connect(emulatorsAction, &QAction::triggered, this, &MainWindow::openEmulatorsWindow);
     menuBar()->addAction(emulatorsAction);
+
+    addGameDialog = new AddGameDialog(this);
+    addGameAction = new QAction("Add Game");
+    connect(addGameAction, &QAction::triggered, this, &MainWindow::openAddGameDialog);
+    menuBar()->addAction(addGameAction);
+
+    dolphinAction = new QAction("Open Dolphin");
+    connect(dolphinAction, &QAction::triggered, this, &MainWindow::openDolphin);
+    menuBar()->addAction(dolphinAction);
 
     scroll = new QScrollArea();
     games = new QWidget();
